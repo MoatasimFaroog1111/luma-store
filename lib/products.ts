@@ -4,7 +4,8 @@ export interface Product {
   tagline: string;
   price: number;
   compareAt?: number;
-  image: string; // emoji or gradient key
+  image: string; // emoji fallback OR /product-images/<id>.png
+  imageUrl?: string; // professional generated image
   gradient: string;
   badge?: string;
   category: string;
@@ -21,6 +22,7 @@ export const PRODUCTS: Product[] = [
     price: 19,
     compareAt: 49,
     image: "📒",
+    imageUrl: "/product-images/planner-bundle.png",
     gradient: "linear-gradient(145deg,#0e3a3a,#041c1c)",
     badge: "Best Seller",
     category: "Planners",
@@ -35,6 +37,7 @@ export const PRODUCTS: Product[] = [
     price: 15,
     compareAt: 39,
     image: "🧠",
+    imageUrl: "/product-images/wellness-journal.png",
     gradient: "linear-gradient(145deg,#1a2e22,#0a1f1a)",
     badge: "Trending",
     category: "Wellness",
@@ -49,6 +52,7 @@ export const PRODUCTS: Product[] = [
     price: 25,
     compareAt: 69,
     image: "🤖",
+    imageUrl: "/product-images/ai-prompts.png",
     gradient: "linear-gradient(145deg,#123c3a,#072625)",
     badge: "High Margin",
     category: "AI Tools",
@@ -63,6 +67,7 @@ export const PRODUCTS: Product[] = [
     price: 12,
     compareAt: 29,
     image: "📊",
+    imageUrl: "/product-images/budget-templates.png",
     gradient: "linear-gradient(145deg,#0a3030,#041c1c)",
     category: "Finance",
     rating: 4.7,
@@ -76,6 +81,7 @@ export const PRODUCTS: Product[] = [
     price: 18,
     compareAt: 45,
     image: "🎨",
+    imageUrl: "/product-images/social-templates.png",
     gradient: "linear-gradient(145deg,#164040,#0a2c2c)",
     badge: "New",
     category: "Marketing",
@@ -90,6 +96,7 @@ export const PRODUCTS: Product[] = [
     price: 22,
     compareAt: 59,
     image: "📚",
+    imageUrl: "/product-images/ebook-bundle.png",
     gradient: "linear-gradient(145deg,#0e3a3a,#061f1f)",
     category: "eBooks",
     rating: 4.6,

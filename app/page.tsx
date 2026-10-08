@@ -204,9 +204,18 @@ export default function Home() {
 function Card({ product, onAdd }: { product: Product; onAdd: () => void }) {
   return (
     <div className="card">
-      <div className="card-img" style={{ background: product.gradient }}>
+      <div className="card-img" style={{ background: product.gradient, padding: 0, overflow: "hidden" }}>
         {product.badge && <span className="card-badge">{product.badge}</span>}
-        <span>{product.image}</span>
+        {product.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+          />
+        ) : (
+          <span>{product.image}</span>
+        )}
       </div>
       <div className="card-body">
         <div className="card-cat">{product.category}</div>
