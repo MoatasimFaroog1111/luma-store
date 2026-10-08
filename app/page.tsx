@@ -7,6 +7,7 @@ import PayPalButton from "@/components/PayPalButton";
 export default function Home() {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [purchased, setPurchased] = useState<string[]>([]);
 
   const addToCart = (id: string) => {
     setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
@@ -139,12 +140,63 @@ export default function Home() {
           </div>
           <div style={{ marginTop: 12 }}>
             <PayPalButton amount={total} disabled={cartItems.length === 0} onSuccess={(d) => {
-              alert("Payment successful! ✓\n\nThank you for your order.\nTransaction: " + (d?.id || "completed"));
+              const ids = Object.keys(cart);
+              setPurchased(ids);
               setCart({});
+              setDrawerOpen(false);
             }} />
           </div>
         </div>
       </div>
+
+      {/* Success / download modal */}
+      {purchased.length > 0 && (
+        <div className="drawer-overlay open" onClick={() => setPurchased([])} />
+      )}
+      {purchased.length > 0 && (
+        <div className="drawer open" style={{ zIndex: 110 }}>
+          <div style={{ textAlign: "center", marginBottom: 16 }}>
+            <div style={{ fontSize: 44 }}>🎉</div>
+            <h2 style={{ margin: "8px 0 4px" }}>Thank you!</h2>
+            <div style={{ color: "var(--color-ok)", fontWeight: 600 }}>Payment successful ✓</div>
+          </div>
+          <div style={{ fontSize: 14, color: "var(--color-muted)", marginBottom: 16 }}>
+            Your products are ready to download. The links never expire.
+          </div>
+          <div style={{ overflowY: "auto", flex: 1 }}>
+            {purchased.map((id) => {
+              const p = PRODUCTS.find((x) => x.id === id);
+              if (!p) return null;
+              return (
+                <div key={id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: "1px solid var(--color-line)" }}>
+                  <div style={{ fontSize: 30 }}>{p.image}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14 }}>{p.name}</div>
+                    <div style={{ fontSize: 12, color: "var(--color-muted)" }}>PDF • Instant download</div>
+                  </div>
+                  <a
+                    href={`/downloads/${id}.pdf`}
+                    download
+                    style={{
+                      background: "var(--color-ink)",
+                      color: "#eaf4f2",
+                      padding: "8px 14px",
+                      borderRadius: 10,
+                      fontSize: 13,
+                      fontWeight: 600,
+                    }}
+                  >
+                    Download
+                  </a>
+                </div>
+              );
+            })}
+          </div>
+          <button className="checkout-btn" onClick={() => setPurchased([])} style={{ marginTop: 16 }}>
+            Continue shopping
+          </button>
+        </div>
+      )}
     </>
   );
 }
