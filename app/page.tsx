@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { PRODUCTS, type Product } from "@/lib/products";
+import PayPalButton from "@/components/PayPalButton";
 
 export default function Home() {
   const [cart, setCart] = useState<Record<string, number>>({});
@@ -135,6 +136,12 @@ export default function Home() {
           </button>
           <div style={{ fontSize: 11, color: "var(--color-muted)", textAlign: "center", marginTop: 8 }}>
             🔒 Secure payment via PayPal / Stripe
+          </div>
+          <div style={{ marginTop: 12 }}>
+            <PayPalButton amount={total} disabled={cartItems.length === 0} onSuccess={(d) => {
+              alert("Payment successful! ✓\n\nThank you for your order.\nTransaction: " + (d?.id || "completed"));
+              setCart({});
+            }} />
           </div>
         </div>
       </div>

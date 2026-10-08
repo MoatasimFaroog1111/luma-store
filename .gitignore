@@ -6,3 +6,4 @@ out
 *.log
 data/
 .DS_Store
+.vercel
