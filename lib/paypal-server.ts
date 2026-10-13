@@ -16,11 +16,11 @@ async function token(): Promise<string> {
   const data = await res.json();
   return data.access_token;
 }
-export async function paypalRequest(path: string, method: "GET" | "POST", body?: unknown): Promise<any> {
+export async function paypalRequest(path: string, method: "GET" | "POST", body?: unknown, requestId?: string): Promise<any> {
   const accessToken = await token();
   const res = await fetch(base() + path, { method, cache: "no-store",
     headers: { Authorization: "Bearer " + accessToken, "Content-Type": "application/json",
-      Prefer: "return=representation" },
+      Prefer: "return=representation", ...(requestId ? { "PayPal-Request-Id": requestId } : {}) },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
   if (!res.ok) throw new Error("PayPal request failed (" + res.status + ")");
