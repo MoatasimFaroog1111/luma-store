@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     const cart = decodeCart(units[0].custom_id || "");
     if (units[0].amount?.currency_code !== "USD" || units[0].amount?.value !== priceFor(cart))
       throw new Error("Order amount mismatch");
-    const result = await paypalRequest("/v2/checkout/orders/" + input.orderId + "/capture", "POST", {});
+    const result = order.status === "COMPLETED" ? order : await paypalRequest("/v2/checkout/orders/" + input.orderId + "/capture", "POST", {}, "luma-capture-" + input.orderId);
     const capture = result.purchase_units?.[0]?.payments?.captures?.[0];
     if (result.id !== input.orderId || result.status !== "COMPLETED" || capture?.status !== "COMPLETED" ||
       capture?.amount?.value !== priceFor(cart) || capture?.amount?.currency_code !== "USD")
