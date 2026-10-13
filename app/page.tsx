@@ -60,7 +60,7 @@ export default function Home() {
 
       <section className="hero">
         <div className="container">
-          <span className="badge">✨ Digital Products — 90%+ profit margin</span>
+          <span className="badge">✨ Digital downloads for work and life</span>
           <h1>Premium digital products,<br />instant delivery.</h1>
           <p>
             Planners, journals, AI prompts and templates. Buy once, download instantly,
@@ -81,7 +81,7 @@ export default function Home() {
         <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 20 }}>Why digital products?</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 18 }}>
           {[
-            ["💸", "90%+ margins", "No inventory, no shipping, no production cost."],
+            ["💸", "One-time purchases", "Useful digital products at clear upfront prices."],
             ["⚡", "Instant delivery", "Customers download immediately after checkout."],
             ["🌍", "Global reach", "Sell to anyone, anywhere, 24/7."],
             ["🔁", "Sell forever", "One product, unlimited sales, no restocking."],
@@ -213,7 +213,7 @@ function Card({ product, onAdd }: { product: Product; onAdd: () => void }) {
             <span className="price">${product.price}</span>
             {product.compareAt && <span className="compare">${product.compareAt}</span>}
           </div>
-          <div className="stars">★ {product.rating} ({product.reviews.toLocaleString()})</div>
+          
         </div>
         <button className="checkout-btn" style={{ marginTop: 10 }} onClick={onAdd}>
           Add to cart
