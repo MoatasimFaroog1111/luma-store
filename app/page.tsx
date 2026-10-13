@@ -8,6 +8,7 @@ export default function Home() {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [purchased, setPurchased] = useState<string[]>([]);
+  const [downloadToken, setDownloadToken] = useState("");
 
   const addToCart = (id: string) => {
     setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
@@ -38,13 +39,6 @@ export default function Home() {
   );
   const total = cartItems.reduce((s, x) => s + x.product.price * x.qty, 0);
   const count = cartItems.reduce((s, x) => s + x.qty, 0);
-
-  const checkout = () => {
-    // Payment integration point: user connects their own PayPal/Stripe here.
-    alert(
-      "Checkout ready ✓\n\nHere you connect your PayPal/Stripe account (client-side or server route).\nTotal: $" + total.toFixed(2),
-    );
-  };
 
   return (
     <>
@@ -132,19 +126,12 @@ export default function Home() {
         <div className="cart-total">
           <div className="row"><span>Subtotal</span><span>${total.toFixed(2)}</span></div>
           <div className="row grand"><span>Total</span><span>${total.toFixed(2)}</span></div>
-          <button className="checkout-btn" onClick={checkout} disabled={cartItems.length === 0}>
-            Checkout — ${total.toFixed(2)}
-          </button>
+          <div style={{ fontSize: 13, textAlign: "center" }}>Secure checkout powered by PayPal</div>
           <div style={{ fontSize: 11, color: "var(--color-muted)", textAlign: "center", marginTop: 8 }}>
-            🔒 Secure payment via PayPal / Stripe
+            🔒 Pay securely with PayPal
           </div>
           <div style={{ marginTop: 12 }}>
-            <PayPalButton amount={total} disabled={cartItems.length === 0} onSuccess={(d) => {
-              const ids = Object.keys(cart);
-              setPurchased(ids);
-              setCart({});
-              setDrawerOpen(false);
-            }} />
+            <PayPalButton cart={cartItems.map(({product, qty}) => ({id: product.id, qty}))} disabled={cartItems.length === 0} onSuccess={(ids, token) => { setPurchased(ids); setDownloadToken(token); setCart({}); setDrawerOpen(false); }} />
           </div>
         </div>
       </div>
@@ -161,7 +148,7 @@ export default function Home() {
             <div style={{ color: "var(--color-ok)", fontWeight: 600 }}>Payment successful ✓</div>
           </div>
           <div style={{ fontSize: 14, color: "var(--color-muted)", marginBottom: 16 }}>
-            Your products are ready to download. The links never expire.
+            Your products are ready to download. Links are valid for 15 minutes. Save your files now.
           </div>
           <div style={{ overflowY: "auto", flex: 1 }}>
             {purchased.map((id) => {
@@ -175,7 +162,7 @@ export default function Home() {
                     <div style={{ fontSize: 12, color: "var(--color-muted)" }}>PDF • Instant download</div>
                   </div>
                   <a
-                    href={`/downloads/${id}.pdf`}
+                    href={`/api/download/${encodeURIComponent(id)}?token=${encodeURIComponent(downloadToken)}`}
                     download
                     style={{
                       background: "var(--color-ink)",
