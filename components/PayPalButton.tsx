@@ -13,11 +13,16 @@ export interface Download {
   url: string;
 }
 
+export interface PurchaseResult {
+  downloads: Download[];
+  email?: string; // set when a receipt is being emailed
+}
+
 interface PayPalButtonProps {
   items: Record<string, number>;
   currency?: string;
   disabled?: boolean;
-  onSuccess?: (downloads: Download[]) => void;
+  onSuccess?: (result: PurchaseResult) => void;
 }
 
 async function postJson(url: string, body?: unknown) {
@@ -84,10 +89,10 @@ export default function PayPalButton({
           return id;
         },
         onApprove: async (data: { orderID: string }) => {
-          const { downloads } = await postJson(
+          const result = await postJson(
             `/api/orders/${encodeURIComponent(data.orderID)}/capture`,
           );
-          onSuccessRef.current?.(downloads);
+          onSuccessRef.current?.(result);
         },
         onError: (err: any) => {
           setError("Payment error: " + (err?.message || "unknown"));
