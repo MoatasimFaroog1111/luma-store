@@ -2,12 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { PRODUCTS, type Product } from "@/lib/products";
-import PayPalButton, { type Download } from "@/components/PayPalButton";
+import PayPalButton, { type PurchaseResult } from "@/components/PayPalButton";
 
 export default function Home() {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [purchased, setPurchased] = useState<Download[]>([]);
+  const [purchase, setPurchase] = useState<PurchaseResult | null>(null);
+  const purchased = purchase?.downloads ?? [];
 
   const addToCart = (id: string) => {
     setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
@@ -125,8 +126,8 @@ export default function Home() {
           <div className="row"><span>Subtotal</span><span>${total.toFixed(2)}</span></div>
           <div className="row grand"><span>Total</span><span>${total.toFixed(2)}</span></div>
           <div style={{ marginTop: 12 }}>
-            <PayPalButton items={cart} disabled={cartItems.length === 0} onSuccess={(downloads) => {
-              setPurchased(downloads);
+            <PayPalButton items={cart} disabled={cartItems.length === 0} onSuccess={(result) => {
+              setPurchase(result);
               setCart({});
               setDrawerOpen(false);
             }} />
@@ -139,7 +140,7 @@ export default function Home() {
 
       {/* Success / download modal */}
       {purchased.length > 0 && (
-        <div className="drawer-overlay open" onClick={() => setPurchased([])} />
+        <div className="drawer-overlay open" onClick={() => setPurchase(null)} />
       )}
       {purchased.length > 0 && (
         <div className="drawer open" style={{ zIndex: 110 }}>
@@ -150,6 +151,7 @@ export default function Home() {
           </div>
           <div style={{ fontSize: 14, color: "var(--color-muted)", marginBottom: 16 }}>
             Your products are ready to download. Save them now — these links stay valid for 7 days.
+            {purchase?.email && <> We&apos;ve also emailed them to <strong>{purchase.email}</strong>.</>}
           </div>
           <div style={{ overflowY: "auto", flex: 1 }}>
             {purchased.map(({ id, url }) => {
@@ -180,7 +182,7 @@ export default function Home() {
               );
             })}
           </div>
-          <button className="checkout-btn" onClick={() => setPurchased([])} style={{ marginTop: 16 }}>
+          <button className="checkout-btn" onClick={() => setPurchase(null)} style={{ marginTop: 16 }}>
             Continue shopping
           </button>
         </div>

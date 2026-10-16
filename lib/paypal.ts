@@ -117,11 +117,18 @@ export async function createOrder(cart: unknown): Promise<string> {
   return order.id;
 }
 
+export interface CapturedOrder {
+  productIds: string[];
+  total: number;
+  email?: string;
+  name?: string;
+}
+
 /**
- * Captures the order on PayPal and returns the purchased product ids, but only
- * after checking that the captured amount matches our own catalog prices.
+ * Captures the order on PayPal and returns what was bought, but only after
+ * checking that the captured amount matches our own catalog prices.
  */
-export async function captureOrder(orderId: string): Promise<string[]> {
+export async function captureOrder(orderId: string): Promise<CapturedOrder> {
   if (!/^[A-Z0-9]{5,40}$/.test(orderId)) throw new PayPalError("Invalid order id.", 400);
   const path = `/v2/checkout/orders/${orderId}`;
 
@@ -150,5 +157,13 @@ export async function captureOrder(orderId: string): Promise<string[]> {
   if (capture.amount?.currency_code !== CURRENCY || capture.amount?.value !== money(total)) {
     throw new PayPalError("Paid amount does not match the order.", 402);
   }
-  return lines.map((l) => l.product.id);
+  const payerName = [order.payer?.name?.given_name, order.payer?.name?.surname]
+    .filter(Boolean)
+    .join(" ");
+  return {
+    productIds: lines.map((l) => l.product.id),
+    total,
+    email: order.payer?.email_address || undefined,
+    name: payerName || undefined,
+  };
 }
