@@ -2,7 +2,7 @@
 """Generate real, useful digital product files (PDF + a welcome README) for Luma Store."""
 import os
 
-OUT = "/opt/data/luma-store/public/downloads"
+OUT = "/opt/data/luma-store/private/downloads"
 os.makedirs(OUT, exist_ok=True)
 
 # Use fpdf2 if available, else fall back to a minimal valid PDF.

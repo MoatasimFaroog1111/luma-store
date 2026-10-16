@@ -2,12 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { PRODUCTS, type Product } from "@/lib/products";
-import PayPalButton from "@/components/PayPalButton";
+import PayPalButton, { type Download } from "@/components/PayPalButton";
 
 export default function Home() {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [purchased, setPurchased] = useState<string[]>([]);
+  const [purchased, setPurchased] = useState<Download[]>([]);
 
   const addToCart = (id: string) => {
     setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
@@ -39,13 +39,6 @@ export default function Home() {
   const total = cartItems.reduce((s, x) => s + x.product.price * x.qty, 0);
   const count = cartItems.reduce((s, x) => s + x.qty, 0);
 
-  const checkout = () => {
-    // Payment integration point: user connects their own PayPal/Stripe here.
-    alert(
-      "Checkout ready ✓\n\nHere you connect your PayPal/Stripe account (client-side or server route).\nTotal: $" + total.toFixed(2),
-    );
-  };
-
   return (
     <>
       <header className="header">
@@ -55,8 +48,7 @@ export default function Home() {
           </div>
           <nav className="nav">
             <a href="#products">Products</a>
-            <a href="#why">Why digital</a>
-            <a href="#faq">FAQ</a>
+            <a href="#why">Why Luma</a>
           </nav>
           <button className="cart-btn" onClick={() => setDrawerOpen(true)}>
             🛒 Cart {count > 0 && <span className="cart-count">{count}</span>}
@@ -66,7 +58,7 @@ export default function Home() {
 
       <section className="hero">
         <div className="container">
-          <span className="badge">✨ Digital Products — 90%+ profit margin</span>
+          <span className="badge">✨ Instant digital downloads</span>
           <h1>Premium digital products,<br />instant delivery.</h1>
           <p>
             Planners, journals, AI prompts and templates. Buy once, download instantly,
@@ -84,13 +76,13 @@ export default function Home() {
       </section>
 
       <section className="container" id="why" style={{ paddingBottom: 60 }}>
-        <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 20 }}>Why digital products?</h2>
+        <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 20 }}>Why Luma?</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 18 }}>
           {[
-            ["💸", "90%+ margins", "No inventory, no shipping, no production cost."],
-            ["⚡", "Instant delivery", "Customers download immediately after checkout."],
-            ["🌍", "Global reach", "Sell to anyone, anywhere, 24/7."],
-            ["🔁", "Sell forever", "One product, unlimited sales, no restocking."],
+            ["⚡", "Instant delivery", "Download your files right after checkout."],
+            ["📱", "Any device", "Print them or use them on your tablet, phone or laptop."],
+            ["🔒", "Secure checkout", "Payments are processed safely by PayPal."],
+            ["♾️", "Yours to keep", "Save your files and use them for as long as you like."],
           ].map(([icon, t, d]) => (
             <div key={t} style={{ background: "var(--color-surface)", border: "1px solid var(--color-line)", borderRadius: 18, padding: 20 }}>
               <div style={{ fontSize: 30 }}>{icon}</div>
@@ -132,19 +124,15 @@ export default function Home() {
         <div className="cart-total">
           <div className="row"><span>Subtotal</span><span>${total.toFixed(2)}</span></div>
           <div className="row grand"><span>Total</span><span>${total.toFixed(2)}</span></div>
-          <button className="checkout-btn" onClick={checkout} disabled={cartItems.length === 0}>
-            Checkout — ${total.toFixed(2)}
-          </button>
-          <div style={{ fontSize: 11, color: "var(--color-muted)", textAlign: "center", marginTop: 8 }}>
-            🔒 Secure payment via PayPal / Stripe
-          </div>
           <div style={{ marginTop: 12 }}>
-            <PayPalButton amount={total} disabled={cartItems.length === 0} onSuccess={(d) => {
-              const ids = Object.keys(cart);
-              setPurchased(ids);
+            <PayPalButton items={cart} disabled={cartItems.length === 0} onSuccess={(downloads) => {
+              setPurchased(downloads);
               setCart({});
               setDrawerOpen(false);
             }} />
+          </div>
+          <div style={{ fontSize: 11, color: "var(--color-muted)", textAlign: "center", marginTop: 8 }}>
+            🔒 Secure payment via PayPal
           </div>
         </div>
       </div>
@@ -161,10 +149,10 @@ export default function Home() {
             <div style={{ color: "var(--color-ok)", fontWeight: 600 }}>Payment successful ✓</div>
           </div>
           <div style={{ fontSize: 14, color: "var(--color-muted)", marginBottom: 16 }}>
-            Your products are ready to download. The links never expire.
+            Your products are ready to download. Save them now — these links stay valid for 7 days.
           </div>
           <div style={{ overflowY: "auto", flex: 1 }}>
-            {purchased.map((id) => {
+            {purchased.map(({ id, url }) => {
               const p = PRODUCTS.find((x) => x.id === id);
               if (!p) return null;
               return (
@@ -175,7 +163,7 @@ export default function Home() {
                     <div style={{ fontSize: 12, color: "var(--color-muted)" }}>PDF • Instant download</div>
                   </div>
                   <a
-                    href={`/downloads/${id}.pdf`}
+                    href={url}
                     download
                     style={{
                       background: "var(--color-ink)",
@@ -226,7 +214,6 @@ function Card({ product, onAdd }: { product: Product; onAdd: () => void }) {
             <span className="price">${product.price}</span>
             {product.compareAt && <span className="compare">${product.compareAt}</span>}
           </div>
-          <div className="stars">★ {product.rating} ({product.reviews.toLocaleString()})</div>
         </div>
         <button className="checkout-btn" style={{ marginTop: 10 }} onClick={onAdd}>
           Add to cart
